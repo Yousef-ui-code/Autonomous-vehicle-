@@ -2,11 +2,24 @@
 
 A simulation-based autonomous vehicle project that detects obstacles and dynamically adjusts its path in real time, inspired by structured-road obstacle avoidance research. Built and validated entirely in simulation (Wokwi) as part of a mechatronics engineering portfolio.
 
-![Wokwi Simulation](./images/wokwi_simulation.png)
+![System Architecture Reference](./images/system_architecture.png)
+*Reference architecture showing how a full-scale autonomous vehicle sensor/compute/actuator stack (Lidar, Jetson Nano, STM32, camera) is typically organized.*
 
 ## Demo Video
 
-Watch the full simulation running: [https://youtu.be/RUuFZ0P9Yqw](https://youtu.be/RUuFZ0P9Yqw)
+Watch the full simulation running: **[https://youtu.be/RUuFZ0P9Yqw](https://youtu.be/RUuFZ0P9Yqw)**
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Motivation & Research Basis](#motivation--research-basis)
+- [Concept Illustrations](#concept-illustrations)
+- [Hardware / Simulation Components](#hardware--simulation-components-wokwi)
+- [How It Works](#how-it-works)
+- [Repository Contents](#repository-contents)
+- [Limitations & Honest Scope](#limitations--honest-scope)
+- [Reference](#reference)
+- [Wokwi Circuit Simulation](#wokwi-circuit-simulation)
 
 ## Overview
 
@@ -26,21 +39,25 @@ This project is inspired by the paper:
 > Li, G.; Li, S.; Peng, Y. *"Obstacle Avoidance Trajectory Planning for Autonomous Vehicles on Structured Roads."* World Electric Vehicle Journal, 2024, 15(4), 168.
 > Paper link: https://www.mdpi.com/2032-6653/15/4/168
 
-The referenced paper proposes an obstacle avoidance trajectory planning method combining an improved Artificial Potential Field (APF) with speed planning over an S-T (station-time) graph, validated on a full-scale autonomous vehicle platform (ROS-based) in the Panosim simulation environment.
+The paper proposes a trajectory-planning method for autonomous vehicles that combines an improved Artificial Potential Field (APF) approach for obstacle avoidance with a speed-planning stage built on an S-T (station–time) graph, and validates the approach on a real vehicle platform in simulation.
 
-This project does **not** implement the full mathematical APF model or S-T graph planning from the paper — it is a simplified embedded-systems interpretation built for an accessible microcontroller platform (Seeed XIAO) in Wokwi. What it borrows conceptually from the paper:
-- The idea that a vehicle should gradually slow as it nears an obstacle rather than react abruptly (analogous to the repulsive force behavior in APF)
-- The idea that after avoiding an obstacle, the vehicle should tend back toward its original path (analogous to the attractive force pulling the vehicle toward its goal trajectory)
+This project does **not** implement the paper's full mathematical APF model or S-T graph planning — it is a simplified embedded-systems interpretation built for an accessible microcontroller platform (Seeed XIAO) in Wokwi. What it borrows conceptually from the paper:
+- The idea that a vehicle should gradually slow as it nears an obstacle rather than react abruptly (analogous to a repulsive-force effect in APF)
+- The idea that after avoiding an obstacle, the vehicle should tend back toward its original path (analogous to an attractive-force pull toward the goal trajectory)
 
 This distinction — what was replicated conceptually versus what was simplified — is stated explicitly and intentionally, to keep the project description accurate rather than overstated.
 
-## System Concept Diagram
+*Note: figures and graphs from the original paper are copyrighted and are not reproduced here. You can view them directly in the paper via the link above. The diagrams below are original illustrations created for this project to explain the same underlying concepts.*
 
-The diagram below illustrates a full-scale reference architecture (Lidar, Jetson Nano, STM32, camera-based sensor fusion) representative of how obstacle-avoidance systems are structured in real autonomous vehicles. It is included here as conceptual/architectural context for how this simplified project's sensor → controller → actuator pipeline maps to a real-world system.
+## Concept Illustrations
 
-![System Architecture Reference](./images/system_architecture.png)
+**Attractive vs. repulsive potential (concept)** — an original diagram illustrating the general APF-style idea this project draws on: a "pull" toward the goal path combined with a "push" away from an obstacle.
 
-*Note: this project's actual implementation uses the simplified Wokwi circuit shown above (Seeed XIAO + IR sensors + servo + DC motor + LEDs), not the full Lidar/Jetson Nano/STM32 stack shown in this reference diagram.*
+![APF Concept Illustration](./images/apf_concept.png)
+
+**Speed behavior implemented in this project** — how drive motor speed is reduced gradually as the measured distance to an obstacle decreases, instead of stopping abruptly:
+
+![Speed vs Distance Behavior](./images/speed_behavior.png)
 
 ## Hardware / Simulation Components (Wokwi)
 
@@ -56,7 +73,7 @@ The diagram below illustrates a full-scale reference architecture (Lidar, Jetson
 ## How It Works
 
 1. IR sensors continuously measure distance to obstacles in front of the vehicle.
-2. As the measured distance decreases, drive motor speed is reduced proportionally rather than cutting off instantly.
+2. As the measured distance decreases, drive motor speed is reduced proportionally rather than cutting off instantly (see [speed behavior graph](#concept-illustrations) above).
 3. When an obstacle is detected within the avoidance threshold, the controller commands the steering servo to turn away from the obstacle.
 4. Status LEDs indicate the current maneuver (e.g., turning left/right, obstacle detected).
 5. Once clear of the obstacle, the vehicle steers back toward its original heading.
@@ -67,8 +84,10 @@ The diagram below illustrates a full-scale reference architecture (Lidar, Jetson
 ├── README.md              # This file
 ├── src/                   # Arduino/Wokwi source code (.ino)
 ├── images/
-│   ├── wokwi_simulation.png       # Wokwi circuit simulation screenshot
-│   └── system_architecture.png    # Reference system architecture diagram
+│   ├── system_architecture.png    # Reference system architecture diagram
+│   ├── apf_concept.png            # Original APF concept illustration
+│   ├── speed_behavior.png         # Original speed-vs-distance behavior graph
+│   └── wokwi_simulation.png       # Wokwi circuit simulation screenshot
 └── docs/
     └── project_report.pdf # Short technical write-up (problem, design rationale, limitations)
 ```
@@ -83,6 +102,11 @@ To keep this project academically honest:
 ## Reference
 
 Li, G.; Li, S.; Peng, Y. Obstacle Avoidance Trajectory Planning for Autonomous Vehicles on Structured Roads. *World Electric Vehicle Journal* 2024, 15(4), 168. https://doi.org/10.3390/wevj15040168
+
+## Wokwi Circuit Simulation
+
+![Wokwi Simulation](./images/wokwi_simulation.png)
+*The actual circuit used for this project: Seeed XIAO microcontroller, dual IR distance sensors, steering servo, drive motor, and status LEDs, simulated in Wokwi.*
 
 ## Author
 
